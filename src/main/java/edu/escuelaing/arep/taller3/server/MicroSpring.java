@@ -9,16 +9,21 @@ import java.util.Map;
 
 import edu.escuelaing.arep.taller3.http.HttpRequest;
 import edu.escuelaing.arep.taller3.server.annotations.GetMapping;
+import edu.escuelaing.arep.taller3.server.annotations.PostMapping;
 import edu.escuelaing.arep.taller3.server.annotations.RequestParam;
 import edu.escuelaing.arep.taller3.server.annotations.RestController;
 
 public class MicroSpring {
 
-    private static Map<String, Method> services = new HashMap<>();
+    private static Map<String, Method> getServices = new HashMap<>();
+    private static Map<String, Method> postServices = new HashMap<>();
 
     public static void start() {
         ClassFileScanner.listClasses();
         loadMethods();
+        getServices.forEach((k, v) -> System.out.println(k + " " + v));
+        System.out.println();
+        postServices.forEach((k, v) -> System.out.println(k + " " + v));
     }
 
     private static void loadMethods() {
@@ -48,19 +53,29 @@ public class MicroSpring {
     private static void processMethods(Class<?> c) {
         for (Method m : c.getDeclaredMethods()) {
             String path = "";
-            if (m.isAnnotationPresent(GetMapping.class)) {
+            if (m.isAnnotationPresent(GetMapping.class) ) {
                 path = m.getAnnotation(GetMapping.class).value();
-                services.put(path, m);
+                getServices.put(path, m);
             }
+            else if(m.isAnnotationPresent(PostMapping.class)){
+                path = m.getAnnotation(PostMapping.class).value();
+                postServices.put(path, m);
+            }   
         }
     }
 
     public static String callMicroSpringService(HttpRequest req) {
         StringBuilder response = new StringBuilder();
         try {
-            System.out.println(req.getPath());
-            return generateRequestReponse(response, services.get(req.getPath()), req);
-
+            if(req.getMethod().equals("GET")){
+                return generateRequestReponse(response, getServices.get(req.getPath()), req);
+            }
+            else if(req.getMethod().equals("POST")){
+                return generateRequestReponse(response, postServices.get(req.getPath()), req);
+            }
+            else{
+                return generateBadRequestResponse(response);
+            }
         } catch (Exception e) {
             return generateBadRequestResponse(response);
         }

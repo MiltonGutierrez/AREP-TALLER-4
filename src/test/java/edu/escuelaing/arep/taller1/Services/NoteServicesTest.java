@@ -1,4 +1,4 @@
-package edu.escuelaing.arep.taller1.services;
+package edu.escuelaing.arep.taller1.Services;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

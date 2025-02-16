@@ -2,6 +2,7 @@ package edu.escuelaing.arep.taller3.services;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import edu.escuelaing.arep.taller3.model.Note;
@@ -42,6 +43,12 @@ public class NoteServicesImpl implements NoteServices {
                         note.getDate().toString()))
                 .collect(Collectors.joining(","))
                 + "]";
+    }
+
+    @Override
+    public void addNote(Map<String, String> noteValues) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'addNote'");
     }
 
 }

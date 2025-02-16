@@ -1,9 +1,8 @@
-package edu.escuelaing.arep.taller1.controller;
+package edu.escuelaing.arep.taller1.Controller;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
+
 
 import edu.escuelaing.arep.taller3.controller.NoteControllerImpl;
 import edu.escuelaing.arep.taller3.http.HttpRequest;
@@ -90,25 +89,26 @@ class NoteControllerTest {
     @Test
     void testPostNoteResponseShouldHandleErrors() {
         String path = "/app/note";
-        HttpRequest req = new HttpRequest(path,"title=&group=personal&content=hola");
+        String method = "POST";
+        HttpRequest req = new HttpRequest(path,"title=&group=personal&content=hola", method);
         String expectedError = "Some parameters are empty";
         String responseByController = noteController.postServices("/app/note").apply(req, new HttpResponse());
         String responseThatShouldReturn = "{ \"error\": " + "\"" + expectedError + "\"}";
         assertEquals(responseByController, responseThatShouldReturn);
 
-        req = new HttpRequest(path,"title=hola&group=hi&content=hola");
+        req = new HttpRequest(path,"title=hola&group=hi&content=hola", method);
         expectedError = "Invalid group";
         responseByController = noteController.postServices("/app/note").apply(req, new HttpResponse());
         responseThatShouldReturn = "{ \"error\": " + "\"" + expectedError + "\"}";
         assertEquals(responseByController, responseThatShouldReturn);
 
-        req = new HttpRequest(path,"title=&group=personal&content=");
+        req = new HttpRequest(path,"title=&group=personal&content=", method);
         expectedError = "Some parameters are empty";
         responseByController = noteController.postServices("/app/note").apply(req, new HttpResponse());
         responseThatShouldReturn = "{ \"error\": " + "\"" + expectedError + "\"}";
         assertEquals(responseByController, responseThatShouldReturn);
 
-        req = new HttpRequest(path,"title=&group=&content=");
+        req = new HttpRequest(path,"title=&group=&content=", method);
         expectedError = "Some parameters are empty";
         responseByController = noteController.postServices("/app/note").apply(req, new HttpResponse());
         responseThatShouldReturn = "{ \"error\": " + "\"" + expectedError + "\"}";
@@ -119,7 +119,7 @@ class NoteControllerTest {
     @Test
     void testPostNoteResponseShouldReturnNote() {
         String path = "/app/note";
-        HttpRequest req = new HttpRequest(path,"title=hola&group=personal&content=hola");
+        HttpRequest req = new HttpRequest(path,"title=hola&group=personal&content=hola", "POST");
         String responseByController = noteController.postServices("/app/note").apply(req, new HttpResponse());
         String responseThatShouldReturn = "{ \"title\": " + "\"hola\", " + "\"group\": " + "\"personal\", "
                 + "\"content\": " + "\"hola\" " + "}";

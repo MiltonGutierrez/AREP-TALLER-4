@@ -7,12 +7,18 @@ import java.util.Map;
 public class HttpRequest {
     private String path = null;
     private String query = null; 
+    private String method = null;
     private Map<String, String> queryParams = new HashMap<>();
 
-    public HttpRequest(String path, String query) {
+    public HttpRequest(String path, String query, String method) {
         this.path = path;
         this.query = query;
+        this.method = method;
         setQueryParams();
+    }
+
+    public String getMethod() {
+        return method;
     }
 
     public String getPath() {

@@ -83,14 +83,14 @@ public class HttpServer {
     }
 
     private static void handleSpringRequests(String method, URI resourceUri, PrintWriter out) {
-        HttpRequest req = new HttpRequest(resourceUri.getPath(), resourceUri.getQuery());
+        HttpRequest req = new HttpRequest(resourceUri.getPath(), resourceUri.getQuery(), method);
         System.out.println(callMicroSpringService(req));
         out.print(callMicroSpringService(req));
         out.flush();
     }
 
     private static void handleAppRequests(String method, URI resourceUri, PrintWriter out) {
-        HttpRequest req = new HttpRequest(resourceUri.getPath(), resourceUri.getQuery());
+        HttpRequest req = new HttpRequest(resourceUri.getPath(), resourceUri.getQuery(), method);
         HttpResponse res = new HttpResponse();
         if (method.equals("GET")) {
             handleAppGetRequests(req, res, out);
