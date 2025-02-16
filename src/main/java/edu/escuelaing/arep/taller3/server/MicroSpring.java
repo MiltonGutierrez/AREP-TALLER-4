@@ -70,14 +70,16 @@ public class MicroSpring {
         }
     }
 
-    private static String generateRequestResponse(StringBuilder response, Method service, HttpRequest req) throws IllegalAccessException, InvocationTargetException {
+    private static String generateRequestResponse(StringBuilder response, Method service, HttpRequest req) throws IllegalAccessException, InvocationTargetException{
         Map<String, String> params = req.getQueryParams(); 
+        System.out.println("SERVICE: " + service);
         Parameter[] parameters = service.getParameters();
-        Object[] args = getArgs(params, parameters);
+        Object[] args = parameters.length == 0 ? null : getArgs(params, parameters);
+        String result = service.invoke(null, args).toString();
         response.append("HTTP/1.1 200 OK\r\n");
         response.append("Content-Type: application/json\r\n");
         response.append("\r\n");
-        response.append(service.invoke(null, args));
+        response.append(result);
         return response.toString();
     }
 
@@ -99,6 +101,7 @@ public class MicroSpring {
      */
     private static Object[] getArgs(Map<String, String> params, Parameter[] parameters ){
         Object[] args = new Object[parameters.length];
+        System.out.println("ARGS: " + args.length);
         for(int i = 0; i < parameters.length; i++){
             Parameter parameter = parameters[i];
             if(parameter.isAnnotationPresent(RequestParam.class)){

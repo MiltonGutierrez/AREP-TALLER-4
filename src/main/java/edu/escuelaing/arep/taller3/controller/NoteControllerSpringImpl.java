@@ -10,26 +10,21 @@ import edu.escuelaing.arep.taller3.server.annotations.PostMapping;
 import edu.escuelaing.arep.taller3.server.annotations.RequestBody;
 import edu.escuelaing.arep.taller3.server.annotations.RestController;
 import edu.escuelaing.arep.taller3.services.NoteServices;
+import edu.escuelaing.arep.taller3.services.NoteServicesImpl;
 import edu.escuelaing.arep.taller3.services.exception.NoteServicesException;
 
 @RestController
-public class NoteControllerSpringImpl implements NoteControllerSpring{
+public class NoteControllerSpringImpl{
 
-    private static NoteServices noteServices;
+    private static NoteServices noteServices = new NoteServicesImpl();
 
-    public NoteControllerSpringImpl(NoteServices noteServices){
-        this.noteServices = noteServices;
-    }
-
-    @Override
-    @GetMapping("/app/note")
-    public String getNotes() {
+    @GetMapping("/spring/note")
+    public static String getNotes() {
         return noteServices.getNotesAsJSON();
     }
 
-    @Override
-    @PostMapping("/app/note")
-    public void createNote(@RequestBody Map<String, String> noteValues) throws NoteServicesException {
+    @PostMapping("/spring/note")
+    public static void createNote(@RequestBody Map<String, String> noteValues) throws NoteServicesException {
         noteServices.addNote(noteValues);
     }
     
