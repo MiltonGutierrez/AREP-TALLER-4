@@ -3,6 +3,7 @@ package edu.escuelaing.arep.taller3.controller;
 import java.util.ArrayList;
 import java.util.Map;
 
+
 import edu.escuelaing.arep.taller3.model.Note;
 import edu.escuelaing.arep.taller3.server.annotations.GetMapping;
 import edu.escuelaing.arep.taller3.server.annotations.PostMapping;
@@ -21,13 +22,13 @@ public class NoteControllerSpringImpl implements NoteControllerSpring{
     }
 
     @Override
-    @GetMapping("/spring/note")
+    @GetMapping("/app/note")
     public String getNotes() {
         return noteServices.getNotesAsJSON();
     }
 
     @Override
-    @PostMapping("/spring/note")
+    @PostMapping("/app/note")
     public void createNote(@RequestBody Map<String, String> noteValues) throws NoteServicesException {
         noteServices.addNote(noteValues);
     }

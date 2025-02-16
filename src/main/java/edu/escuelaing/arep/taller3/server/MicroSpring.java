@@ -15,15 +15,12 @@ import edu.escuelaing.arep.taller3.server.annotations.RestController;
 
 public class MicroSpring {
 
-    private static Map<String, Method> getServices = new HashMap<>();
-    private static Map<String, Method> postServices = new HashMap<>();
+    private static Map<String, Method> services = new HashMap<>();
 
     public static void start() {
         ClassFileScanner.listClasses();
         loadMethods();
-        getServices.forEach((k, v) -> System.out.println(k + " " + v));
-        System.out.println();
-        postServices.forEach((k, v) -> System.out.println(k + " " + v));
+        services.forEach((k, v) -> System.out.println(k + " " + v));
     }
 
     private static void loadMethods() {
@@ -53,13 +50,13 @@ public class MicroSpring {
     private static void processMethods(Class<?> c) {
         for (Method m : c.getDeclaredMethods()) {
             String path = "";
-            if (m.isAnnotationPresent(GetMapping.class) ) {
+            if (m.isAnnotationPresent(GetMapping.class)){
                 path = m.getAnnotation(GetMapping.class).value();
-                getServices.put(path, m);
+                services.put("GET " + path, m);
             }
             else if(m.isAnnotationPresent(PostMapping.class)){
                 path = m.getAnnotation(PostMapping.class).value();
-                postServices.put(path, m);
+                services.put("POST " + path, m);
             }   
         }
     }
@@ -67,39 +64,32 @@ public class MicroSpring {
     public static String callMicroSpringService(HttpRequest req) {
         StringBuilder response = new StringBuilder();
         try {
-            if(req.getMethod().equals("GET")){
-                return generateRequestReponse(response, getServices.get(req.getPath()), req);
-            }
-            else if(req.getMethod().equals("POST")){
-                return generateRequestReponse(response, postServices.get(req.getPath()), req);
-            }
-            else{
-                return generateBadRequestResponse(response);
-            }
+            return generateRequestResponse(response, services.get(req.getMethod() + " " + req.getPath()), req);
         } catch (Exception e) {
             return generateBadRequestResponse(response);
         }
     }
 
+    private static String generateRequestResponse(StringBuilder response, Method service, HttpRequest req) throws IllegalAccessException, InvocationTargetException {
+        Map<String, String> params = req.getQueryParams(); 
+        Parameter[] parameters = service.getParameters();
+        Object[] args = getArgs(params, parameters);
+        response.append("HTTP/1.1 200 OK\r\n");
+        response.append("Content-Type: application/json\r\n");
+        response.append("\r\n");
+        response.append(service.invoke(null, args));
+        return response.toString();
+    }
+
+
     private static String generateBadRequestResponse(StringBuilder response) {
         response.append("HTTP/1.1 400 Bad Request\r\n");
         response.append("Content-Type: application/json\r\n");
         response.append("\r\n");
-        response.append("{ \"error\": " + "\"" + "Invalid POST request" + "\"}");
+        response.append("{ \"error\": " + "\"" + "Invalid Request" + "\"}");
         return response.toString();
     }
 
-    private static String generateRequestReponse(StringBuilder response, Method service, HttpRequest req) throws IllegalAccessException, InvocationTargetException {
-        Map<String, String> params = req.getQueryParams(); 
-        Parameter[] parameters = service.getParameters();
-        Object[] args = getArgs(params, parameters);
-        String result = "{ \"greeting\": " + "\"" + service.invoke(null, args) + "\" " + "}";
-        response.append("HTTP/1.1 200 OK\r\n");
-        response.append("Content-Type: application/json\r\n");
-        response.append("\r\n");
-        response.append(result);
-        return response.toString();
-    }
 
     /**
      * 
