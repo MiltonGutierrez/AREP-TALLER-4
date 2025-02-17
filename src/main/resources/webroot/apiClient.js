@@ -10,7 +10,7 @@ const apiClient = (() => {
 
     const addNote = async (title, group, content ) => {
         
-        const promise = await fetch(`${urlSpark}note?title=${encodeURIComponent(title)}&group=${encodeURIComponent(group)}&content=${encodeURIComponent(content)}`, {
+        const promise = await fetch(`${urlSpring}note?title=${encodeURIComponent(title)}&group=${encodeURIComponent(group)}&content=${encodeURIComponent(content)}`, {
             method: 'POST',
         });
         return promise;

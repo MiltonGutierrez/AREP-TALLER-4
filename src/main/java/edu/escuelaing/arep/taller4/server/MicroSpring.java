@@ -10,6 +10,7 @@ import java.util.Map;
 import edu.escuelaing.arep.taller4.http.HttpRequest;
 import edu.escuelaing.arep.taller4.server.annotations.GetMapping;
 import edu.escuelaing.arep.taller4.server.annotations.PostMapping;
+import edu.escuelaing.arep.taller4.server.annotations.RequestBody;
 import edu.escuelaing.arep.taller4.server.annotations.RequestParam;
 import edu.escuelaing.arep.taller4.server.annotations.RestController;
 
@@ -74,7 +75,7 @@ public class MicroSpring {
         Map<String, String> params = req.getQueryParams(); 
         System.out.println("SERVICE: " + service);
         Parameter[] parameters = service.getParameters();
-        Object[] args = parameters.length == 0 ? null : getArgs(params, parameters);
+        Object[] args = parameters.length == 0 ? null : getArgs(params, parameters, req);
         String result = service.invoke(null, args).toString();
         response.append("HTTP/1.1 200 OK\r\n");
         response.append("Content-Type: application/json\r\n");
@@ -99,7 +100,7 @@ public class MicroSpring {
      * @param parameters
      * @return arguments of the method. for the momentm when there's a RequestParam annotation it adds the value otherwise it ignores it
      */
-    private static Object[] getArgs(Map<String, String> params, Parameter[] parameters ){
+    private static Object[] getArgs(Map<String, String> params, Parameter[] parameters, HttpRequest req ){
         Object[] args = new Object[parameters.length];
         System.out.println("ARGS: " + args.length);
         for(int i = 0; i < parameters.length; i++){
@@ -110,9 +111,14 @@ public class MicroSpring {
                     args[i] = params.getOrDefault(requestParam.value(), requestParam.defaultValue());
                 }
             }
+            if(parameter.isAnnotationPresent(RequestBody.class)){
+                RequestBody requestBody = parameter.getAnnotation(RequestBody.class);
+                if(requestBody != null){
+                    args[i] = req.getQueryParams();
+                }
+            }
         }
         return args;
 
     }
-
 }
