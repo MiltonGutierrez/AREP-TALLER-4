@@ -18,9 +18,11 @@ public class HttpServer {
     public static final int PORT = 8080;
     public static String WEB_ROOT;
     private static String INDEX_PAGE_URI = "/notes.html";
-    private static boolean RUNNING = true;
+    private static volatile boolean RUNNING = true;
     private static final NoteControllerImpl noteController = new NoteControllerImpl();
     private static final String HTTP_400_BAD_REQUEST = "HTTP/1.1 400 Bad Request";
+    private static ExecutorService threadPool;
+    private static ServerSocket serverSocket;
     private static int MAX_THREADS = 10;
 
 
@@ -32,28 +34,53 @@ public class HttpServer {
         WEB_ROOT = path;
     }
 
-    public static void runServer() {
-        ExecutorService threadPool = Executors.newFixedThreadPool(MAX_THREADS);
+    public static void stopServer() {
+        RUNNING = false;
         try {
-            ServerSocket serverSocket = new ServerSocket(PORT);
-            System.out.println("Server started at port: " + PORT);
-            while (RUNNING) {
-                Socket clientSocket = serverSocket.accept();
-                threadPool.execute( () -> {
-                    try {
-                        handleRequests(clientSocket);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                });
+            if (serverSocket != null && !serverSocket.isClosed()) {
+                serverSocket.close();
             }
-            serverSocket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        shutdownServer();
+    }
+
+    private static void shutdownServer() {
+        if (threadPool != null && !threadPool.isShutdown()) {
+            threadPool.shutdown();
+        }
+    }
+
+    public static void runServer() {
+        threadPool = Executors.newFixedThreadPool(MAX_THREADS);
+        try {
+            serverSocket = new ServerSocket(PORT);
+
+            System.out.println("Server started at port: " + PORT);
+
+            while (RUNNING) {
+                try {
+                    Socket clientSocket = serverSocket.accept();
+                    threadPool.execute(() -> {
+                        try {
+                            handleRequests(clientSocket);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    });
+                } catch (IOException e) {
+                    if (!RUNNING) {
+                        System.out.println("Server shutting down...");
+                        break;
+                    }
+                }
+            }
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
-            threadPool.shutdown();
+            shutdownServer();
         }
-
     }
 
     private static void handleRequests(Socket clientSocket) throws IOException {
@@ -62,7 +89,7 @@ public class HttpServer {
         BufferedOutputStream dataOut = new BufferedOutputStream(clientSocket.getOutputStream());
 
         String readline = in.readLine();
-        if (readline == null){
+        if (readline == null) {
             closeResources(clientSocket, in, out);
             return;
         }
@@ -79,7 +106,7 @@ public class HttpServer {
             handleAppRequests(httpVerb, resourceUri, out);
         } else if (resource.startsWith("/spring")) {
             System.out.println("Request SPRING for: " + resource);
-            handleSpringRequests(httpVerb, resourceUri,out);
+            handleSpringRequests(httpVerb, resourceUri, out);
         } else {
             out.println(HTTP_400_BAD_REQUEST);
             out.println("Content-Type: text/html");
@@ -87,7 +114,7 @@ public class HttpServer {
             out.println("<html><body><h1>400 Bad Request</h1></body></html>");
             out.flush();
         }
-         closeResources(clientSocket, in, out);
+        closeResources(clientSocket, in, out);
     }
 
     private static void handleSpringRequests(String method, URI resourceUri, PrintWriter out) {
@@ -137,12 +164,11 @@ public class HttpServer {
                 response.append("Content-Type: application/json");
                 response.append("\r\n");
                 response.append(jsonResponse);
-            } 
-            else {
-            response.append("HTTP/1.1 200 OK\r\n");
-            response.append("Content-Type: application/json\r\n");
-            response.append("\r\n");
-            response.append(jsonResponse);
+            } else {
+                response.append("HTTP/1.1 200 OK\r\n");
+                response.append("Content-Type: application/json\r\n");
+                response.append("\r\n");
+                response.append(jsonResponse);
             }
         } catch (Exception e) {
             response.append(HTTP_400_BAD_REQUEST);
