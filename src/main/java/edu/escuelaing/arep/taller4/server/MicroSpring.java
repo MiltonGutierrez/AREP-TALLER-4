@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import edu.escuelaing.arep.taller4.http.HttpRequest;
+import edu.escuelaing.arep.taller4.http.HttpResponse;
 import edu.escuelaing.arep.taller4.server.annotations.GetMapping;
 import edu.escuelaing.arep.taller4.server.annotations.PostMapping;
 import edu.escuelaing.arep.taller4.server.annotations.RequestBody;
@@ -21,7 +22,6 @@ public class MicroSpring {
     public static void start() {
         ClassFileScanner.listClasses();
         loadMethods();
-        services.forEach((k, v) -> System.out.println(k + " " + v));
     }
 
     private static void loadMethods() {
@@ -72,15 +72,22 @@ public class MicroSpring {
     }
 
     private static String generateRequestResponse(StringBuilder response, Method service, HttpRequest req) throws IllegalAccessException, InvocationTargetException{
+        System.out.println();
         Map<String, String> params = req.getQueryParams(); 
         Parameter[] parameters = service.getParameters();
         Object[] args = parameters.length == 0 ? null : getArgs(params, parameters, req);
         Object result = service.invoke(null, args);
         result = result == null ? "{ \"status\": " + "\"" + "ok" + "\"}"  : result;
-        response.append("HTTP/1.1 200 OK\r\n");
+        if(req.getMethod().equals("GET")){
+            response.append(HttpResponse.OK);
+        }
+        else{
+            response.append(HttpResponse.CREATED);
+        }
         response.append("Content-Type: application/json\r\n");
         response.append("\r\n");
         response.append(result.toString());
+        System.out.println(response.toString());
         return response.toString();
     }
 

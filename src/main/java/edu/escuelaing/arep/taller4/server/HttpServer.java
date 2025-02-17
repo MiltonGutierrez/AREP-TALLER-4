@@ -1,6 +1,8 @@
 package edu.escuelaing.arep.taller4.server;
 
 import java.net.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.function.BiFunction;
 
 import edu.escuelaing.arep.taller4.controller.NoteControllerImpl;
@@ -19,6 +21,7 @@ public class HttpServer {
     private static boolean RUNNING = true;
     private static final NoteControllerImpl noteController = new NoteControllerImpl();
     private static final String HTTP_400_BAD_REQUEST = "HTTP/1.1 400 Bad Request";
+    private static int MAX_THREADS = 10;
 
 
     public static void setIndexPageUri(String uri) {
@@ -30,20 +33,25 @@ public class HttpServer {
     }
 
     public static void runServer() {
+        ExecutorService threadPool = Executors.newFixedThreadPool(MAX_THREADS);
         try {
             ServerSocket serverSocket = new ServerSocket(PORT);
             System.out.println("Server started at port: " + PORT);
             while (RUNNING) {
-                Socket clientSocket = null;
-                clientSocket = serverSocket.accept();
-
-                if (clientSocket != null) {
-                    handleRequests(clientSocket);
-                }
+                Socket clientSocket = serverSocket.accept();
+                threadPool.execute( () -> {
+                    try {
+                        handleRequests(clientSocket);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                });
             }
             serverSocket.close();
         } catch (IOException e) {
             e.printStackTrace();
+        } finally {
+            threadPool.shutdown();
         }
 
     }
@@ -54,9 +62,10 @@ public class HttpServer {
         BufferedOutputStream dataOut = new BufferedOutputStream(clientSocket.getOutputStream());
 
         String readline = in.readLine();
-        if (readline == null)
+        if (readline == null){
+            closeResources(clientSocket, in, out);
             return;
-
+        }
         String[] parts = readline.split(" ");
         String httpVerb = parts[0];
         String resource = parts[1].equals("/") ? INDEX_PAGE_URI : parts[1];
@@ -78,14 +87,11 @@ public class HttpServer {
             out.println("<html><body><h1>400 Bad Request</h1></body></html>");
             out.flush();
         }
-        out.close();
-        in.close();
-        clientSocket.close();
+         closeResources(clientSocket, in, out);
     }
 
     private static void handleSpringRequests(String method, URI resourceUri, PrintWriter out) {
         HttpRequest req = new HttpRequest(resourceUri.getPath(), resourceUri.getQuery(), method);
-        System.out.println(callMicroSpringService(req));
         out.print(callMicroSpringService(req));
         out.flush();
     }
@@ -115,6 +121,7 @@ public class HttpServer {
             response.append("\r\n");
             response.append("<html><body><h1>404 Not Found</h1></body></html>");
         } finally {
+            System.out.println(response.toString());
             out.print(response.toString());
             out.flush();
         }
@@ -143,6 +150,7 @@ public class HttpServer {
             response.append("\r\n");
             response.append("{ \"error\": " + "\"" + "Invalid POST request" + "\"}");
         } finally {
+            System.out.println(response.toString());
             out.print(response.toString());
             out.flush();
         }
@@ -193,5 +201,15 @@ public class HttpServer {
             fileIn.read(fileBytes);
         }
         return fileBytes;
+    }
+
+    private static void closeResources(Socket socket, BufferedReader in, PrintWriter out) {
+        try {
+            in.close();
+            out.close();
+            socket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

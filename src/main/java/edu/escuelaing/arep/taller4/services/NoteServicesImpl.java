@@ -2,6 +2,8 @@ package edu.escuelaing.arep.taller4.services;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -11,10 +13,10 @@ import edu.escuelaing.arep.taller4.services.exception.NoteServicesException;
 
 public class NoteServicesImpl implements NoteServices {
 
-    private ArrayList<Note> notes = new ArrayList<>();
+    private List<Note> notes = Collections.synchronizedList(new ArrayList<>());
 
     @Override
-    public ArrayList<Note> getNotes() {
+    public List<Note> getNotes() {
         return notes;
     }
 
@@ -47,6 +49,7 @@ public class NoteServicesImpl implements NoteServices {
 
     @Override
     public void addNote(Map<String, String> noteValues) throws NoteServicesException {
+        System.out.println("Adding note: ");
         addNote(noteValues.get("title"), noteValues.get("group"), noteValues.get("content"));
     }
 
