@@ -22,7 +22,6 @@ public class NoteControllerSpringImpl{
 
     @PostMapping("/spring/note")
     public static void createNote(@RequestBody Map<String, String> noteValues) throws NoteServicesException {
-        noteValues.forEach((k,v) -> System.out.println(k + " " + v));
         noteServices.addNote(noteValues);
     }
     

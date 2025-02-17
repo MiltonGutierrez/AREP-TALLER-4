@@ -46,9 +46,8 @@ public class NoteServicesImpl implements NoteServices {
     }
 
     @Override
-    public void addNote(Map<String, String> noteValues) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'addNote'");
+    public void addNote(Map<String, String> noteValues) throws NoteServicesException {
+        addNote(noteValues.get("title"), noteValues.get("group"), noteValues.get("content"));
     }
 
 }

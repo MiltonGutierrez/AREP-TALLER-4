@@ -4,7 +4,7 @@ const apiClient = (() => {
     const urlSpring = '/spring/';
 
     const getNotes = async () => {
-        const response = await fetch(urlSpark + 'note');
+        const response = await fetch(urlSpring + 'note');
         return response.json();
     }
 

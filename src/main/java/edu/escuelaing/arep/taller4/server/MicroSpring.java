@@ -67,6 +67,7 @@ public class MicroSpring {
         try {
             return generateRequestResponse(response, services.get(req.getMethod() + " " + req.getPath()), req);
         } catch (Exception e) {
+            System.out.println(" exception " + e + "cause  " + e.getCause() + " message " + e.getMessage());
             return generateBadRequestResponse(response);
         }
     }
@@ -76,11 +77,14 @@ public class MicroSpring {
         System.out.println("SERVICE: " + service);
         Parameter[] parameters = service.getParameters();
         Object[] args = parameters.length == 0 ? null : getArgs(params, parameters, req);
-        String result = service.invoke(null, args).toString();
+        System.out.println(parameters.length);
+        Object result = service.invoke(null, args);
+        System.out.println("RESULT: " + result);    
+        result = result == null ? "{ \"title\": " + "\"" + "ok" + "\"}"  : result;
         response.append("HTTP/1.1 200 OK\r\n");
         response.append("Content-Type: application/json\r\n");
         response.append("\r\n");
-        response.append(result);
+        response.append(result.toString());
         return response.toString();
     }
 
