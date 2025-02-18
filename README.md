@@ -143,6 +143,11 @@ Deploy
 
 ![image](https://github.com/user-attachments/assets/dcc80f7a-5712-4263-ba28-5f4beb65e563)
 
+![image](https://github.com/user-attachments/assets/f78963e8-df2e-480c-a8d6-c03c19ae77a3)
+
+Funcionamiento.
+
+![image](https://github.com/user-attachments/assets/18757fcb-829b-48bd-a75b-1026aad6813d)
 
 
 ## Construido con.
