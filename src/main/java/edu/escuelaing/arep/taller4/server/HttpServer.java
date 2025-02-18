@@ -186,7 +186,6 @@ public class HttpServer {
             throws IOException {
         String contentType = getContentType(requestedResource);
         File resource = new File(WEB_ROOT, requestedResource);
-        System.out.println("weboots: " + WEB_ROOT + " requestedResource: " + requestedResource);
         if (resource.exists() && !resource.isDirectory()) {
             int resourceLength = (int) resource.length();
             out.println("HTTP/1.1 200 OK");

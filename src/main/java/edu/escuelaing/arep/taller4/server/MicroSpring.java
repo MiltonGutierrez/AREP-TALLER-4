@@ -64,6 +64,7 @@ public class MicroSpring {
 
     public static String callMicroSpringService(HttpRequest req) {
         StringBuilder response = new StringBuilder();
+        System.out.println("Hola");
         try {
             return generateRequestResponse(response, services.get(req.getMethod() + " " + req.getPath()), req);
         } catch (Exception e) {

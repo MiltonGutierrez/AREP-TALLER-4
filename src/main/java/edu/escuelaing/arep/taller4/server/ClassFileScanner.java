@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ClassFileScanner {
-    private static final String BASE_DIR = "target/classes";
+    private static final String BASE_DIR = "/arep/bin/classes";
     private static List<String> classPaths = new ArrayList<>();
 
 
