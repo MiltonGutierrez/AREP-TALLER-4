@@ -124,117 +124,26 @@ Se presentara el diagrama de clases que describe los métodos y las dependencias
    - Éxito: `200 OK` con JSON de notas.  
    - Error: `400 Bad Request` con mensaje descriptivo (ej: parámetros inválidos).
    - 
-### Validaciones y Pruebas:
-- Se implementaron pruebas automatizadas con **JUnit** para validar solicitudes `GET`/`POST`, incluyendo manejo de errores (ej: parámetros inválidos devuelven código `400` y JSON con detalles).
-- El cliente incluye validaciones frontend para evitar enviar datos incompletos.
 
-## Correr las pruebas 
+### Creacion de imagenes de docker
+![image](https://github.com/user-attachments/assets/465b2805-f34f-4977-820b-436b998b9e4b)
 
-Para ejecutar las pruebas automatizadas del sistema:
+![image](https://github.com/user-attachments/assets/6d50c726-aa12-42b0-aa7b-ce8c376b7f9f)
 
-```bash
-mvn test
-```
+Funcionamiento local
 
-### Pruebas 
-
-Estas pruebas validan el correcto funcionamiento de las funcionalidades principales del servidor. Especificamente las peticiones GET y POST hacia el recurso /app/note (para la realización de estas se utilizo JUnit Jupiter. Una muestra de estas pruebas es: 
-```java
-    @Test
-    void testGetNotesResponseShouldReturnEmptyArray() {
-        String responseByController = noteController.getServices("/app/note").apply(null, null);
-        String responseThatShouldReturn = "[" + "]";
-        assertEquals(responseByController, responseThatShouldReturn);
-    }
-```
-# Descripción de las Pruebas
-
-## 1. testGetNotesResponseShouldReturnEmptyArray
-**Propósito:**  
-Verificar que el método `getNotes()` retorne un Array vacio..
-
-**Qué prueba:**
-- Cuerpo de la respuesta como un arreglo JSON vacío (`[]`).
-
-## 2. testGetNotesResponseShouldReturnArrayWithCreatedNotes
-**Propósito:**  
-Validar que `getNotes()` retorne un JSON con todas las notas creadas, incluyendo sus metadatos.
-
-**Qué prueba:**
-- Formato correcto de los campos: `title`, `group`, `content`, `date`.
-- Coherencia entre las notas añadidas y las mostradas.
-
-## 3. testPostNoteResponseShouldHandleErrors
-**Propósito:**  
-Garantizar que el controlador maneje errores en solicitudes POST con parámetros inválidos.
-
-**Qué prueba:**
-- Respuestas 400 Bad Request para casos como:
-  - Parámetros vacíos (`title=`, `group=`, `content=`).
-  - Grupos no permitidos (ej: `group=hi`).
-  - Mensajes de error claros en formato JSON (ej: `{"error": "Some parameters are empty"}`).
-
-## 4. testPostNoteResponseShouldReturnNote
-**Propósito:**  
-Asegurar que una solicitud POST válida retorne la nota creada en formato JSON.
-
-**Qué prueba:**
-- Coincidencia exacta entre los campos enviados (`title`, `group`, `content`) y los devueltos.
-
-## 5. shouldThrowNotesServicesExceptionSomeParametersAreEmpty
-**Propósito:**  
-Validar que el servicio rechace parámetros vacíos lanzando `NoteServicesException`.
-
-**Qué prueba:**
-- Escenarios como:
-  - Todos los campos vacíos.
-  - Campos parcialmente vacíos (`title=`, `group=work`, `content=`).
-
-## 6. shouldThrowNotesServicesExceptionInvalidGroup
-**Propósito:**  
-Comprobar que el servicio solo permita grupos predefinidos (`personal` o `work`).
-
-**Qué prueba:**
-- Lanzamiento de excepciones para grupos no válidos (ej: `invalid`, `personal1`).
-
-## 7. shouldAddNotes
-**Propósito:**  
-Confirmar que el servicio añade notas correctamente cuando los parámetros son válidos.
-
-**Qué prueba:**
-- Incremento del tamaño de la lista de notas después de agregar elementos.
-- Ausencia de excepciones en casos válidos.
-
-## 8. shouldSayHelloWorld
-- Prueba que en caso de que el request no incluya el parametro "name" devuelva naturalmente *Hello World!*.
-
-## 9. shouldSayHelloWithName
--Prueba que en caso de que el request incluya el parametro "name" devuelva *Hello 'name'!.
-
-# Tecnologías Usadas en Pruebas
-- **JUnit Jupiter 5:** Para pruebas unitarias y parametrizadas.
-- **Maven:** Gestión de dependencias y ejecución de pruebas.
-
-- **Resultado de las pruebas**
-![image](https://github.com/user-attachments/assets/d2645602-e945-453b-8444-b100a1b6e2e1)
+![image](https://github.com/user-attachments/assets/c7246674-3390-4ee5-854e-c6861077b92a)
 
 
-### Muestra de la ejecución
+Deploy
 
-1. Acceso al aplicativo:
-![image](https://github.com/user-attachments/assets/7942c3df-bb6f-479a-9a4c-a3da2f44ade8)
-2. Ejemplo creación de la nota
-![image](https://github.com/user-attachments/assets/a2da0022-34cf-48a0-a57e-5965e6db0b0b)
-3. Ejemplo petición de notas creadas
-![image](https://github.com/user-attachments/assets/63429968-5db6-44f2-9b22-b9d873899ce3)
-4. Ejemplo añadir nota con datos incompletos (se realiza la validación desde el cliente por lo que no se ejecuta la petición)
-![image](https://github.com/user-attachments/assets/35d2ef47-8986-4233-807f-ed11c2dd91f0)
-5. Ejemplo petición al recurso /app/pi
-![image](https://github.com/user-attachments/assets/da8ef5df-8767-4064-bf42-ee1e5f871c60)}
-6. Ejemplo petición al recurso /app/hello (sin parámetro)
-![image](https://github.com/user-attachments/assets/ce07a53f-bebf-4f5e-9592-b1d652eca69e)
-7. Ejemplo petición al recurso /app/hello (con parámetro)
-![image](https://github.com/user-attachments/assets/496746b9-499d-4a23-9886-1020df2fd422)
+![image](https://github.com/user-attachments/assets/d0d82af3-fb9c-4866-b041-66327b56c248)
+
+![image](https://github.com/user-attachments/assets/49adc5d2-70d8-4ad6-9896-919cf4434ce0)
+
+![image](https://github.com/user-attachments/assets/dcc80f7a-5712-4263-ba28-5f4beb65e563)
+
+
 
 ## Construido con.
 
