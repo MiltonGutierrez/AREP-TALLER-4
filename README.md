@@ -27,19 +27,21 @@ Pasos para configurar el entorno de desarrollo:
    cd AREP-TALLER-5
    ```
 
-2. Compila el proyecto usando Maven:
-
-   ```bash
-   mvn clean compile
-   ```
-
-
 ### Creacion de imagenes de docker
 
-Para poder crear un contenedor primero creamos la imagen:
+Para poder crear un contenedor primero creamos el Dockerfile y para poder crear la imagen se ejecuta el siguiente comando 
+   ```bash
+   docker build --tag arep4 .
+   ```
 ![image](https://github.com/user-attachments/assets/465b2805-f34f-4977-820b-436b998b9e4b)
 
-Una vez creada la imagen creamos el contender como se muestra:
+
+Una vez creada la imagen se crea el contenedor con el siguiente comando:
+
+   ```bash
+   docker run -d -p 34000:8080 arepc arep4
+   ```
+
 
 ![image](https://github.com/user-attachments/assets/6d50c726-aa12-42b0-aa7b-ce8c376b7f9f)
 
