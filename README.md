@@ -136,7 +136,7 @@ Se presentara el diagrama de clases que describe los métodos y las dependencias
 ![image](https://github.com/user-attachments/assets/c7246674-3390-4ee5-854e-c6861077b92a)
 
 
-### Dockerizcion y virtualizacion contenedor docker con EC2
+### Dockerizcaion y virtualizacion contenedor docker con EC2
 
 ![image](https://github.com/user-attachments/assets/d0d82af3-fb9c-4866-b041-66327b56c248)
 
@@ -149,6 +149,9 @@ Se presentara el diagrama de clases que describe los métodos y las dependencias
 ### Funcionamiento.
 
 ![image](https://github.com/user-attachments/assets/18757fcb-829b-48bd-a75b-1026aad6813d)
+
+https://github.com/user-attachments/assets/b55b5316-7438-40c9-9ada-abadfe624234
+
 
 # Descripción de las Pruebas
 
