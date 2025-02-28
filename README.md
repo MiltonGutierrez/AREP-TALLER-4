@@ -150,6 +150,77 @@ Se presentara el diagrama de clases que describe los métodos y las dependencias
 
 ![image](https://github.com/user-attachments/assets/18757fcb-829b-48bd-a75b-1026aad6813d)
 
+# Descripción de las Pruebas
+
+## 1. testGetNotesResponseShouldReturnEmptyArray
+**Propósito:**  
+Verificar que el método `getNotes()` retorne un Array vacio..
+
+**Qué prueba:**
+- Cuerpo de la respuesta como un arreglo JSON vacío (`[]`).
+
+## 2. testGetNotesResponseShouldReturnArrayWithCreatedNotes
+**Propósito:**  
+Validar que `getNotes()` retorne un JSON con todas las notas creadas, incluyendo sus metadatos.
+
+**Qué prueba:**
+- Formato correcto de los campos: `title`, `group`, `content`, `date`.
+- Coherencia entre las notas añadidas y las mostradas.
+
+## 3. testPostNoteResponseShouldHandleErrors
+**Propósito:**  
+Garantizar que el controlador maneje errores en solicitudes POST con parámetros inválidos.
+
+**Qué prueba:**
+- Respuestas 400 Bad Request para casos como:
+  - Parámetros vacíos (`title=`, `group=`, `content=`).
+  - Grupos no permitidos (ej: `group=hi`).
+  - Mensajes de error claros en formato JSON (ej: `{"error": "Some parameters are empty"}`).
+
+## 4. testPostNoteResponseShouldReturnNote
+**Propósito:**  
+Asegurar que una solicitud POST válida retorne la nota creada en formato JSON.
+
+**Qué prueba:**
+- Coincidencia exacta entre los campos enviados (`title`, `group`, `content`) y los devueltos.
+
+## 5. shouldThrowNotesServicesExceptionSomeParametersAreEmpty
+**Propósito:**  
+Validar que el servicio rechace parámetros vacíos lanzando `NoteServicesException`.
+
+**Qué prueba:**
+- Escenarios como:
+  - Todos los campos vacíos.
+  - Campos parcialmente vacíos (`title=`, `group=work`, `content=`).
+
+## 6. shouldThrowNotesServicesExceptionInvalidGroup
+**Propósito:**  
+Comprobar que el servicio solo permita grupos predefinidos (`personal` o `work`).
+
+**Qué prueba:**
+- Lanzamiento de excepciones para grupos no válidos (ej: `invalid`, `personal1`).
+
+## 7. shouldAddNotes
+**Propósito:**  
+Confirmar que el servicio añade notas correctamente cuando los parámetros son válidos.
+
+**Qué prueba:**
+- Incremento del tamaño de la lista de notas después de agregar elementos.
+- Ausencia de excepciones en casos válidos.
+
+## 8. shouldSayHelloWorld
+- Prueba que en caso de que el request no incluya el parametro "name" devuelva naturalmente *Hello World!*.
+
+## 9. shouldSayHelloWithName
+-Prueba que en caso de que el request incluya el parametro "name" devuelva *Hello 'name'!.
+
+# Tecnologías Usadas en Pruebas
+- **JUnit Jupiter 5:** Para pruebas unitarias y parametrizadas.
+- **Maven:** Gestión de dependencias y ejecución de pruebas.
+
+- **Resultado de las pruebas**
+![image](https://github.com/user-attachments/assets/d2645602-e945-453b-8444-b100a1b6e2e1)
+
 
 ## Construido con.
 
