@@ -2,11 +2,9 @@
 
 ### Arquitectura Empresarial - AREP
 
-#  TALLER MICROFRAMEWORKS
+#  TALLER VIRTUALIZACION
 
-En este taller construí un servidor web en Java, similar a Apache, que fue capaz de entregar páginas HTML e imágenes en formato PNG. Además, desarrollé un framework IoC que permitió la construcción de aplicaciones web a partir de POJOs.
-
-Utilizando este servidor, creé una aplicación web de ejemplo para demostrar su funcionamiento. Es importante destacar que el servidor atendió múltiples solicitudes, aunque no de manera concurrente. Como parte del desarrollo, se implementó un prototipo mínimo que evidenció las capacidades reflexivas de Java. Este prototipo permitió, al menos, la carga de un bean (POJO) y la generación de una aplicación web basada en él.
+El desarrollo de este laboratorio comienza con la construcción de una aplicación web utilizando un framework propio (MicroSpring), evitando el uso de Spring. Se mejora el framework para soportar concurrencia y un apagado elegante. Posteriormente, la aplicación se empaqueta en un contenedor Docker y se prueba en el entorno local. Luego, se crea un repositorio en DockerHub donde se sube la imagen del contenedor. Finalmente, se despliega la aplicación en AWS configurando una instancia EC2, instalando Docker en ella y ejecutando el contenedor con la imagen previamente almacenada en DockerHub, garantizando así su disponibilidad en la nube.
 
 ## Empezando
 
@@ -14,7 +12,7 @@ Estas instrucciones te permitirán obtener una copia del proyecto y ejecutarlo e
 
 ### Prerequisitos
 
-- Java 21 preferiblemente.
+- Java 17 preferiblemente.
 - Maven 3.x
 - Acceso a una terminal.
 
@@ -25,8 +23,8 @@ Pasos para configurar el entorno de desarrollo:
 1. Clona el repositorio del proyecto:
 
    ```bash
-   git clone https://github.com/MiltonGutierrez/AREP-TALLER-3.git
-   cd AREP-TALLER-3
+   git clone https://github.com/MiltonGutierrez/AREP-TALLER-4.git
+   cd AREP-TALLER-5
    ```
 
 2. Compila el proyecto usando Maven:
@@ -35,13 +33,17 @@ Pasos para configurar el entorno de desarrollo:
    mvn clean compile
    ```
 
-3. Ejecuta el servidor:
 
-   ```bash
-   java -cp target/classes edu.escuelaing.arep.taller3.App
-   ```
+### Creacion de imagenes de docker
 
-4. Accede al servidor desde tu navegador en [http://localhost:8080](http://localhost:8080).
+Para poder crear un contenedor primero creamos la imagen:
+![image](https://github.com/user-attachments/assets/465b2805-f34f-4977-820b-436b998b9e4b)
+
+Una vez creada la imagen creamos el contender como se muestra:
+
+![image](https://github.com/user-attachments/assets/6d50c726-aa12-42b0-aa7b-ce8c376b7f9f)
+
+Accede al servidor local mediante el contenedor docker desde tu navegador en [http://localhost:34000](http://localhost:34000).
 
 ## Arquitectura
 
@@ -64,13 +66,14 @@ El siguiente diagrama de componentes describe la estructura básica de la aplica
 ### Flujo de la Aplicación:
 1. El navegador envía solicitudes al **HttpServer** (puerto 8080, mediante el inicio del server en App) este procesa la peticion de archivos HTML, CSS, JS e imagenes..
 2. El **Controller** recibe las solicitudes del endpoint /app, valida los parámetros y delega la lógica a los `Services` creando al final la respuesta.
-3. El **MicroSpring** carga las clases con la anotación @RestController y los metodos, de manera que reciba las solicitudes al endpoint /spring *(en este caso solo /hello)*.
+3. El **MicroSpring** carga las clases con la anotación @RestController y los metodos, de manera que reciba las solicitudes al endpoint /spring *(en este caso get /hello, /note y post /note)*.
 4. Los **Services** interactúan con el **Model** para acceder a la estructura de datos de modo que pueda responder a la petición..
 
 ### Diagrama de Clases y Explicación.
 Se presentara el diagrama de clases que describe los métodos y las dependencias entre las clases existentes para cada componente del backend.
 
-![Clases AREP](https://github.com/user-attachments/assets/a151df7e-237a-4f67-ab71-d1dd123c4050)
+![Clases AREP](https://github.com/user-attachments/assets/dae759a4-7d8d-4cf8-9743-119c38993e36)
+
 
 #### Clases Principales:
 1. **Clase** `HttpServer`:
@@ -81,6 +84,7 @@ Se presentara el diagrama de clases que describe los métodos y las dependencias
      - `noteController`: Controlador para peticiones con el endpoint /app/**.
    - **Métodos Destacados**:
      - `runServer()`: Inicia el servidor y acepta conexiones.
+     - `stopServer()`: Detiene el servidor de manera elegante.
      - `handleRequests()`: Dirige solicitudes a métodos específicos (GET/POST) .
      - `handleGetRequests()`: Retorna archivos estáticos que se encuentran en el webroot del servidor (ej: *notes.html*).
      - `handleSpringRequests`: Dirige las solicitudes del enpoint /spring.
@@ -88,7 +92,7 @@ Se presentara el diagrama de clases que describe los métodos y las dependencias
      - `handleAppPostRequests()`:Maneja las solicitudes *POST* realizadas al endpoint /app/** de manera que utiliza la función lamda implementada en el controlador para poder realizar la petición.
        
 2. **Clase** `MicroSpring`:
-   - **Responsabilidad**: Núcleo del microframework basado en spring, utiliza la clase `ClassFileScanner` para obtener el listado de clases con la anotación @RestController, de manera que pueda obtener los metodos con la       anotación @GetMapping, y guardarlos en un Map<String, Method>, adicionalmente procesa las solicitudes del endpoint /spring.
+   - **Responsabilidad**: Núcleo del microframework basado en spring, utiliza la clase `ClassFileScanner` para obtener el listado de clases con la anotación @RestController, de manera que pueda obtener los metodos con la anotación @GetMapping y @PostMapping, los almacena en un Map<String, Method> (para cada verbo existente (get y post)) adicionalmente procesa las solicitudes del endpoint /spring y las anotaciones @RequestBody y @RequestParam
    
 3. **Controladores**:
    - **Clase `NoteControllerImpl`**:
@@ -97,6 +101,8 @@ Se presentara el diagrama de clases que describe los métodos y las dependencias
      - **Dependencia**: `NoteServices` (inyección de servicios).
    - **Clase `GreetingController`**:
      - Utiliza la anotacion @RestController, y por el momento tiene un metodo con @GetMapping("/spring/hello") de manera que pide un parametro con @RequestParam, esto para poder devolver un saludo.
+        **Clase `NoteControllerSpringImpl`**:
+     - Utiliza la anotacion @RestController, y por el momento tiene un 2 metodo con @GetMapping("/spring/note")  y  @PostMapping("/spring/note").
 4. **Servicios**:
    - **Interfaz `NoteServices`**:
      - Define operaciones como `addNote()` y `getNotes()`.
@@ -107,7 +113,6 @@ Se presentara el diagrama de clases que describe los métodos y las dependencias
    - **Clase `Note`**:
      - Representa una nota con atributos: `title`, `group`, `content`, `date`.
      - **Nota**: `date` sugiere el uso de `LocalDate` para manejar fechas.
-    
 6. **Http**
    - **Clase `HttpRequest`**
       - Implementa la función *getQueryParams()* que permite obtener la lista de los querys en la petición.
@@ -123,19 +128,15 @@ Se presentara el diagrama de clases que describe los métodos y las dependencias
 5. **Respuesta HTTP**:  
    - Éxito: `200 OK` con JSON de notas.  
    - Error: `400 Bad Request` con mensaje descriptivo (ej: parámetros inválidos).
-   - 
-
-### Creacion de imagenes de docker
-![image](https://github.com/user-attachments/assets/465b2805-f34f-4977-820b-436b998b9e4b)
-
-![image](https://github.com/user-attachments/assets/6d50c726-aa12-42b0-aa7b-ce8c376b7f9f)
-
-Funcionamiento local
+  
+## Virtualización y dockerización
+ 
+### Funcionamiento contenedor docker local
 
 ![image](https://github.com/user-attachments/assets/c7246674-3390-4ee5-854e-c6861077b92a)
 
 
-Deploy
+### Dockerizcion y virtualizacion contenedor docker con EC2
 
 ![image](https://github.com/user-attachments/assets/d0d82af3-fb9c-4866-b041-66327b56c248)
 
@@ -145,7 +146,7 @@ Deploy
 
 ![image](https://github.com/user-attachments/assets/f78963e8-df2e-480c-a8d6-c03c19ae77a3)
 
-Funcionamiento.
+### Funcionamiento.
 
 ![image](https://github.com/user-attachments/assets/18757fcb-829b-48bd-a75b-1026aad6813d)
 
